@@ -14,16 +14,35 @@ using System.Runtime.CompilerServices;
 
 namespace Mowali {
     public sealed class SettingsWrapper : INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
         private const string DATA_FILE_NAME = "data.mwl";
+        
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        private static SettingsWrapper instance;
-
+        #region Class (de)construction
         private ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
         private StorageFolder localFolder = ApplicationData.Current.LocalFolder;
 
-        private ObservableCollection<Movie> toWatchList;
-        private ObservableCollection<Movie> watchedList;
+        private SettingsWrapper() {
+            LoadDataFile();
+        }
+
+        private async void LoadDataFile() {
+            var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.OpenIfExists);
+            var json = await FileIO.ReadTextAsync(dataFile);
+            JObject obj = JObject.Parse(json);
+            toWatchList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["ToWatch"]);
+            watchedList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["Watched"]);
+        }
+
+        public async void saveDataFile() {
+            string dataJson = await JsonConvert.SerializeObjectAsync(new { ToWatch = toWatchList, Watched = watchedList });
+            var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(dataFile, dataJson);
+        }
+        #endregion
+
+        #region Instance accessor
+        private static SettingsWrapper instance;
 
         private static object lockerObject = new object();
         public static SettingsWrapper Instance {
@@ -38,38 +57,23 @@ namespace Mowali {
                 return instance;
             }
         }
-
-        #region Class initialization
-        private SettingsWrapper() {
-            LoadDataFile();
-        }
-
-        private async void LoadDataFile() {
-            var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.OpenIfExists);
-            var json = await FileIO.ReadTextAsync(dataFile);
-            JObject obj = JObject.Parse(json);
-            toWatchList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["ToWatch"]);
-            watchedList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["Watched"]);
-        }
-
-        public async void saveDataFile(){
-            string dataJson = await JsonConvert.SerializeObjectAsync(new { ToWatch = toWatchList, Watched = watchedList });
-            var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(dataFile, dataJson);
-        }
         #endregion
 
+        #region Data accessors
+        private ObservableCollection<Movie> toWatchList;
         public ObservableCollection<Movie> ToWatchList {
             get {
                 return toWatchList;
             }
         }
 
+        private ObservableCollection<Movie> watchedList;
         public ObservableCollection<Movie> WatchedList {
             get {
                 return watchedList;
             }
         }
+        #endregion
 
         private void OnPropertyChanged([CallerMemberName] string caller = "") {
             if(PropertyChanged != null) {
