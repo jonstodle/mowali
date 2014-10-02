@@ -15,17 +15,17 @@ using System.Runtime.CompilerServices;
 namespace Mowali {
     public sealed class SettingsWrapper : INotifyPropertyChanged {
         public event PropertyChangedEventHandler PropertyChanged;
-        const string DATA_FILE_NAME = "data.mwl";
+        private const string DATA_FILE_NAME = "data.mwl";
 
-        static SettingsWrapper instance;
+        private static SettingsWrapper instance;
 
-        ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
-        StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+        private ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
+        private StorageFolder localFolder = ApplicationData.Current.LocalFolder;
 
-        ObservableCollection<Movie> toWatchList;
-        ObservableCollection<Movie> watchedList;
+        private ObservableCollection<Movie> toWatchList;
+        private ObservableCollection<Movie> watchedList;
 
-        static object lockerObject = new object();
+        private static object lockerObject = new object();
         public static SettingsWrapper Instance {
             get {
                 if(instance == null) {
@@ -40,11 +40,11 @@ namespace Mowali {
         }
 
         #region Class initialization
-        SettingsWrapper() {
+        private SettingsWrapper() {
             LoadDataFile();
         }
 
-        async void LoadDataFile() {
+        private async void LoadDataFile() {
             var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.OpenIfExists);
             var json = await FileIO.ReadTextAsync(dataFile);
             JObject obj = JObject.Parse(json);
@@ -71,7 +71,7 @@ namespace Mowali {
             }
         }
 
-        void OnPropertyChanged([CallerMemberName] string caller = "") {
+        private void OnPropertyChanged([CallerMemberName] string caller = "") {
             if(PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(caller));
             }
