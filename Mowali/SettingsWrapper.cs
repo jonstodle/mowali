@@ -15,11 +15,15 @@ using System.Runtime.CompilerServices;
 namespace Mowali {
     public sealed class SettingsWrapper : INotifyPropertyChanged {
         private const string DATA_FILE_NAME = "data.mwl";
-        
+        private const string APP_NAME = "mowali";
+        private const int APP_COLOR_HEX = 900020;
+        private const int APP_COLOR_R = 144;
+        private const int APP_COLOR_G = 0;
+        private const int APP_COLOR_B = 32;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Class (de)construction
-        private ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
         private StorageFolder localFolder = ApplicationData.Current.LocalFolder;
 
         private SettingsWrapper() {
@@ -29,13 +33,18 @@ namespace Mowali {
         private async void LoadDataFile() {
             var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.OpenIfExists);
             var json = await FileIO.ReadTextAsync(dataFile);
-            JObject obj = JObject.Parse(json);
-            toWatchList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["ToWatch"]);
-            watchedList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["Watched"]);
+            if(!string.IsNullOrWhiteSpace(json)) {
+                JObject obj = JObject.Parse(json);
+                toWatchList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["ToWatch"]);
+                watchedList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["Watched"]);
+            } else {
+                toWatchList = new ObservableCollection<Movie>();
+                watchedList = new ObservableCollection<Movie>();
+            }
         }
 
         public async void saveDataFile() {
-            string dataJson = await JsonConvert.SerializeObjectAsync(new { ToWatch = toWatchList, Watched = watchedList });
+            string dataJson = await Task.Factory.StartNew(() => JsonConvert.SerializeObject(new { ToWatch = toWatchList, Watched = watchedList }));
             var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.ReplaceExisting);
             await FileIO.WriteTextAsync(dataFile, dataJson);
         }
@@ -73,6 +82,20 @@ namespace Mowali {
                 return watchedList;
             }
         }
+        #endregion
+
+        #region Settings accessors
+        private ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
+
+
+        #endregion
+
+        #region Constant accessors
+        public string AppName { get { return APP_NAME; } }
+        public int AppColorHex { get { return APP_COLOR_HEX; } }
+        public int AppColorR { get { return APP_COLOR_R; } }
+        public int AppColorG { get { return APP_COLOR_G; } }
+        public int AppColorB { get { return APP_COLOR_B; } }
         #endregion
 
         private void OnPropertyChanged([CallerMemberName] string caller = "") {
