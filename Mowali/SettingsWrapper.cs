@@ -14,21 +14,34 @@ namespace Mowali {
     public sealed class SettingsWrapper {
         const string DATA_FILE_NAME = "data.mwl";
 
-        static ApplicationDataContainer roamingSettings;
-        static StorageFolder localFolder;
+        static SettingsWrapper instance;
 
-        static ObservableCollection<Movie> toWatchList;
-        static ObservableCollection<Movie> watchedList;
+        ApplicationDataContainer roamingSettings = ApplicationData.Current.RoamingSettings;
+        StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+
+        ObservableCollection<Movie> toWatchList;
+        ObservableCollection<Movie> watchedList;
+
+        static object lockerObject = new object();
+        public SettingsWrapper Instance {
+            get {
+                if(instance == null) {
+                    lock(lockerObject) {
+                        if(instance == null) {
+                            instance = new SettingsWrapper();
+                        }
+                    }
+                }
+                return instance;
+            }
+        }
 
         #region Class initialization
-        static SettingsWrapper() {
-            roamingSettings = ApplicationData.Current.RoamingSettings;
-            localFolder = ApplicationData.Current.LocalFolder;
-
+        SettingsWrapper() {
             LoadDataFile();
         }
 
-        async static void LoadDataFile() {
+        async void LoadDataFile() {
             var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.OpenIfExists);
             var json = await FileIO.ReadTextAsync(dataFile);
             JObject obj = JObject.Parse(json);
@@ -36,20 +49,20 @@ namespace Mowali {
             watchedList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["Watched"]);
         }
 
-        public async static void saveDataFile(){
+        public async void saveDataFile(){
             string dataJson = await JsonConvert.SerializeObjectAsync(new { ToWatch = toWatchList, Watched = watchedList });
             var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.ReplaceExisting);
             await FileIO.WriteTextAsync(dataFile, dataJson);
         }
         #endregion
 
-        public static ObservableCollection<Movie> ToWatchList {
+        public ObservableCollection<Movie> ToWatchList {
             get {
                 return toWatchList;
             }
         }
 
-        public static ObservableCollection<Movie> WatchedList {
+        public ObservableCollection<Movie> WatchedList {
             get {
                 return watchedList;
             }
