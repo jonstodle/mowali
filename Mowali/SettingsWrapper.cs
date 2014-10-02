@@ -29,7 +29,7 @@ namespace Mowali {
         }
 
         async static void LoadDataFile() {
-            var dataFile = await localFolder.GetFileAsync(DATA_FILE_NAME);
+            var dataFile = await localFolder.CreateFileAsync(DATA_FILE_NAME, CreationCollisionOption.OpenIfExists);
             var json = await FileIO.ReadTextAsync(dataFile);
             JObject obj = JObject.Parse(json);
             toWatchList = await JsonConvert.DeserializeObjectAsync<ObservableCollection<Movie>>((string)obj["ToWatch"]);
