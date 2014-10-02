@@ -62,7 +62,7 @@ namespace Mowali
                 rootFrame = new Frame();
 
                 // TODO: change this value to a cache size that is appropriate for your application
-                rootFrame.CacheSize = 1;
+                rootFrame.CacheSize = 10;
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
@@ -125,6 +125,7 @@ namespace Mowali
             var deferral = e.SuspendingOperation.GetDeferral();
 
             // TODO: Save application state and stop any background activity
+            SettingsWrapper.Instance.saveDataFile();
             deferral.Complete();
         }
     }
