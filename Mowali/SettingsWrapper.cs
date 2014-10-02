@@ -9,9 +9,12 @@ using TmdbWrapper.Movies;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Mowali {
-    public sealed class SettingsWrapper {
+    public sealed class SettingsWrapper : INotifyPropertyChanged {
+        public event PropertyChangedEventHandler PropertyChanged;
         const string DATA_FILE_NAME = "data.mwl";
 
         static SettingsWrapper instance;
@@ -23,7 +26,7 @@ namespace Mowali {
         ObservableCollection<Movie> watchedList;
 
         static object lockerObject = new object();
-        public SettingsWrapper Instance {
+        public static SettingsWrapper Instance {
             get {
                 if(instance == null) {
                     lock(lockerObject) {
@@ -65,6 +68,12 @@ namespace Mowali {
         public ObservableCollection<Movie> WatchedList {
             get {
                 return watchedList;
+            }
+        }
+
+        void OnPropertyChanged([CallerMemberName] string caller = "") {
+            if(PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs(caller));
             }
         }
     }
