@@ -3,6 +3,7 @@ using Windows.UI.Xaml;
 using System.Threading.Tasks;
 using Mowali.Services.SettingsServices;
 using Windows.ApplicationModel.Activation;
+using Mowali.Services.Telemetry;
 
 namespace Mowali
 {
@@ -21,6 +22,8 @@ namespace Mowali
 			InitializeComponent();
 			SplashFactory = (e) => new Views.Splash(e);
 
+			TelemetryService.Instance.LogLifecycleEvent("Construct");
+
 			#region App settings
 
 			_settings = SettingsService.Instance;
@@ -34,6 +37,8 @@ namespace Mowali
 		// runs even if restored from state
 		public override async Task OnInitializeAsync(IActivatedEventArgs args)
 		{
+			TelemetryService.Instance.LogLifecycleEvent("Initialize");
+
 			// setup hamburger shell
 			var nav = NavigationServiceFactory(BackButton.Attach, ExistingContent.Include);
 			Window.Current.Content = new Views.Shell(nav);
@@ -43,6 +48,8 @@ namespace Mowali
 		// runs only when not restored from state
 		public override async Task OnStartAsync(StartKind startKind, IActivatedEventArgs args)
 		{
+			TelemetryService.Instance.LogLifecycleEvent("Start");
+
 			// perform long-running load
 			await Task.Delay(0);
 
