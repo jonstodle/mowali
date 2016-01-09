@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mowali.Handlers
+namespace Mowali.Services.Telemetry
 {
-	public class LogHandler
+	public class TelemetryService : ITelemetryService
 	{
-		private static Lazy<LogHandler> lazy = new Lazy<LogHandler>(() => new LogHandler());
-		public static LogHandler Current { get { return lazy.Value; } }
-
-		private LogHandler() { }
+		public static TelemetryService Instance { get; }
+		static TelemetryService()
+		{
+			Instance = Instance ?? new TelemetryService();
+		}
 
 
 
@@ -50,7 +51,7 @@ namespace Mowali.Handlers
 				{"ParentContainer", parentContainer },
 				{"FailedAction", failedAction }
 			};
-			
+
 			client.TrackException(exception, properties);
 		}
 	}
