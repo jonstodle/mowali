@@ -42,5 +42,16 @@ namespace Mowali.Handlers
 		{
 			client.TrackPageView(pageName);
 		}
+
+		public void LogException(string parentContainer, string failedAction, Exception exception)
+		{
+			var properties = new Dictionary<string, string>
+			{
+				{"ParentContainer", parentContainer },
+				{"FailedAction", failedAction }
+			};
+			
+			client.TrackException(exception, properties);
+		}
 	}
 }
