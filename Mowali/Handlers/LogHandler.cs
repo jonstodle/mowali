@@ -25,7 +25,7 @@ namespace Mowali.Handlers
 				{"EventType", eventType }
 			};
 
-			client.TrackEvent("LifecycleEvent");
+			client.TrackEvent("LifecycleEvent", properties);
 		}
 
 		public void LogUserAction(string actionType)
@@ -35,7 +35,7 @@ namespace Mowali.Handlers
 				{"ActionType", actionType }
 			};
 
-			client.TrackEvent("UserAction");
+			client.TrackEvent("UserAction", properties);
 		}
 
 		public void LogPageView(string pageName)
