@@ -11,7 +11,7 @@
 
     <Controls:ModalDialog IsModal="{x:Bind IsBusy, Mode=OneWay}">
         <Controls:ModalDialog.Content>
-            <Controls:HamburgerMenu x:Name="MyHamburgerMenu" IsFullScreen="False">
+            <Controls:HamburgerMenu x:Name="MyHamburgerMenu" IsFullScreen="False" VisualStateNarrowMinWidth="-1" VisualStateNormalMinWidth="0">
 
                 <Controls:HamburgerMenu.PrimaryButtons>
                     <Controls:HamburgerButtonInfo ClearHistory="True" PageType="views:MainPage">
