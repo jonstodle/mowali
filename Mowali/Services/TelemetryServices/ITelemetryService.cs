@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mowali.Services.Telemetry
+namespace Mowali.Services.TelemetryServices
 {
 	public interface ITelemetryService
 	{

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Mowali.Services.Telemetry
+namespace Mowali.Services.TelemetryServices
 {
 	public class TelemetryService : ITelemetryService
 	{
