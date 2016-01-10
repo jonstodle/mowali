@@ -3,7 +3,7 @@ using Windows.UI.Xaml;
 using System.Threading.Tasks;
 using Mowali.Services.SettingsServices;
 using Windows.ApplicationModel.Activation;
-using Mowali.Services.Telemetry;
+using Mowali.Services.TelemetryServices;
 
 namespace Mowali
 {
